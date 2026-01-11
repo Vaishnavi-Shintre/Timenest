@@ -35,6 +35,14 @@ body {
   transition: background 0.3s ease;
 }
 
+/* Utility class if you want to force Inter on specific elements */
+.font-inter {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -182,6 +190,12 @@ input, select, button {
   font-family: inherit;
 }
 
+/* Make dropdown boxes stand out with a darker base and blue accent */
+select {
+  background: #020617; /* near-black to match dark theme */
+  border-color: #1d4ed8; /* blue border */
+}
+
 input:focus, select:focus {
   outline: none;
   border-color: var(--primary);
@@ -213,7 +227,9 @@ main > .card {
   max-width: 500px;
   margin: 0 auto;
   width: 100%;
-}button:active {
+}
+
+button:active {
   transform: translateY(0);
 }
 
@@ -261,6 +277,128 @@ button.secondary {
 
 .section-grid-spaced {
   margin-top: 2rem;
+}
+
+.focus-layout {
+  margin-top: 1.5rem;
+  align-items: flex-start;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
+}
+
+@media (max-width: 900px) {
+  .focus-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tasks-page main > .card {
+  max-width: none;
+  margin: 0;
+}
+
+.tasks-layout {
+  align-items: flex-start;
+}
+
+.tasks-form-card {
+  max-width: 420px;
+}
+
+.tasks-list-card {
+  min-height: 300px;
+}
+
+.error-text {
+  color: var(--danger);
+  min-height: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Auth pages */
+.auth-page main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+}
+
+.auth-card {
+  max-width: 440px;
+}
+
+.auth-form .form-group + .form-group {
+  margin-top: 1rem;
+}
+
+.helper-text {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.password-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.password-field input {
+  flex: 1;
+}
+
+.ghost-btn {
+  width: auto;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: none;
+}
+
+.ghost-btn:hover {
+  box-shadow: none;
+  background: var(--panel-hover);
+}
+
+.auth-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.auth-row-between .helper-text {
+  margin-top: 0;
+}
+
+.link-muted {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.link-muted:hover {
+  color: var(--primary);
+}
+
+.auth-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  color: #1f2933;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
 }
 
 .profile-avatar {
@@ -319,6 +457,265 @@ button.secondary {
 .welcome-title {
   margin-bottom: 1.5rem;
   font-size: 2rem;
+}
+
+/* Dashboard */
+.dashboard-stats {
+  margin-bottom: 1rem;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.badge-soft {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--muted);
+}
+
+.inline-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.inline-form-main {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.inline-form-main input,
+.inline-form-main select {
+  margin: 0;
+}
+
+.inline-form-button {
+  width: auto;
+  padding-inline: 1.25rem;
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  transition: all 0.2s ease;
+}
+
+.todo-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--primary);
+}
+
+.todo-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.todo-checkbox {
+  width: auto;
+}
+
+.todo-title {
+  font-weight: 500;
+}
+
+.todo-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pill-priority {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.pill-high { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+.pill-medium { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+.pill-low { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+
+.focus-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.focus-summary-item {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.focus-session {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(129, 140, 248, 0.4);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.focus-session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.focus-session-name {
+  font-weight: 600;
+}
+
+.focus-session-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.focus-session-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.focus-session-controls button {
+  min-height: 36px;
+  font-size: 0.8rem;
+  padding-inline: 0.9rem;
+}
+
+.focus-session--idle {
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.focus-session--running {
+  border-color: var(--primary);
+  box-shadow: 0 12px 40px rgba(129, 140, 248, 0.45);
+}
+
+.focus-session--completed {
+  border-color: var(--success);
+  box-shadow: 0 10px 32px rgba(52, 211, 153, 0.4);
+}
+
+.focus-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .focus-tools-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.focus-tool-card {
+  background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.15), rgba(15, 23, 42, 0.9));
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 0.75rem;
+  min-height: 210px;
+}
+
+.focus-tool-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.6);
+  border-color: var(--primary);
+}
+
+.focus-tool-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.focus-tool-card h4 {
+  font-size: 1rem;
+}
+
+.focus-tool-badge {
+  font-size: 0.7rem;
+}
+
+.focus-tool-description {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.focus-primary-btn {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.focus-tool-card-active {
+  border-color: var(--primary);
+  box-shadow: 0 16px 45px rgba(129, 140, 248, 0.5);
+  transform: translateY(-4px);
+}
+
+.focus-card-session {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.focus-card-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.focus-card-controls {
+  display: flex;
+  gap: 0.4rem;
+}
+
+body.focus-mode-active .focus-tool-card {
+  opacity: 0.45;
+  filter: saturate(0.7);
+}
+
+body.focus-mode-active .focus-tool-card-active {
+  opacity: 1;
+  filter: none;
 }
 
 /* Profile page styles */
@@ -942,6 +1339,24 @@ button.secondary {
 
 .task-item.completed strong {
   text-decoration: line-through;
+}
+
+@keyframes taskCompletePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); box-shadow: 0 10px 25px rgba(52, 211, 153, 0.4); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+@keyframes taskDeleteSlide {
+  to { opacity: 0; transform: translateX(8px); }
+}
+
+.task-item.task-anim-complete {
+  animation: taskCompletePulse 0.3s ease-out;
+}
+
+.task-item.task-anim-delete {
+  animation: taskDeleteSlide 0.25s ease-out forwards;
 }
 
 .btn-group {

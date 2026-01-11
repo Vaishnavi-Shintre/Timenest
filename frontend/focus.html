@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Focus Tools • Time Nest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Time Nest</h1>
+    <button id="hamburger-menu" title="Toggle menu">☰</button>
+    <nav id="navbar">
+      <a href="./dashboard.html">Dashboard</a>
+      <a href="./tasks.html">Tasks</a>
+      <a href="./focus.html" class="active-nav-link">Tools</a>
+      <a href="./profile.html">Profile</a>
+      <button id="theme-toggle" title="Toggle theme">🌙</button>
+      <button id="logout-btn" class="logout-btn">Logout</button>
+    </nav>
+  </header>
+  <main>
+    <h2 class="welcome-title">Find Focus Tools</h2>
+
+    <section class="grid focus-layout">
+      <div class="card">
+        <h3>Today's Focus</h3>
+        <p class="muted">Track how long you stayed in deep work today.</p>
+        <div class="focus-summary-grid mt-1-5">
+          <div class="focus-summary-item">
+            <div class="stat-label">Focus time today</div>
+            <div class="stat-value" id="focus-time-today">0m</div>
+          </div>
+          <div class="focus-summary-item">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="focus-streak">0 days</div>
+          </div>
+        </div>
+        <div class="focus-session" id="focus-session-detail" aria-live="polite">
+          <div class="focus-session-header">
+            <div>
+              <div class="stat-label">Active session</div>
+              <div class="focus-session-name" id="focus-session-name">No session running</div>
+            </div>
+            <div class="focus-session-timer" id="focus-session-timer">00:00</div>
+          </div>
+          <p class="muted" id="focus-session-meta">Start a focus tool below to see details here.</p>
+          <div class="focus-session-controls" id="focus-session-controls">
+            <button class="ghost-btn" id="focus-session-pause" type="button">Pause</button>
+            <button class="secondary" id="focus-session-stop" type="button">Stop</button>
+          </div>
+        </div>
+        <p class="muted mt-1" id="focus-message">Start a focus session below to begin your streak.</p>
+      </div>
+
+      <div class="card" id="focus-tools-section">
+        <h3>Focus Tools</h3>
+        <p class="muted mb-1">Choose a method to stay in deep work and track your minutes.</p>
+        <div id="focus-tools" class="focus-tools-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/theme.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/dashboard.js"></script>
+  <script>
+    // Hamburger menu toggle
+    const hamburger = document.getElementById('hamburger-menu');
+    const navbar = document.getElementById('navbar');
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        navbar.classList.toggle('active');
+      });
+
+      navbar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navbar.classList.remove('active');
+        });
+      });
+    }
+
+    // Logout button functionality
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        window.TimeNestAuth.logout();
+        window.location.href = './login.html';
+      });
+    }
+  </script>
+</body>
+
+</html>

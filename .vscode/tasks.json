@@ -1,0 +1,50 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Time Nest backend",
+			"type": "shell",
+			"command": "E:/Timenest/Timenest/.venv/Scripts/python.exe",
+			"args": [
+				"-m",
+				"flask",
+				"--app",
+				"backend.app",
+				"--debug",
+				"run"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Run Time Nest backend (with Mongo)",
+			"type": "shell",
+			"command": "E:/Timenest/Timenest/.venv/Scripts/python.exe",
+			"args": [
+				"-m",
+				"flask",
+				"--app",
+				"backend.app",
+				"--debug",
+				"run"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Run Time Nest backend (with Mongo)",
+			"type": "shell",
+			"command": "E:/Timenest/Timenest/.venv/Scripts/python.exe",
+			"args": [
+				"-m",
+				"flask",
+				"--app",
+				"backend.app",
+				"--debug",
+				"run"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

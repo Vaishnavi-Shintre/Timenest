@@ -4,46 +4,88 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tasks • Time Nest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./css/style.css" />
   </head>
-  <body>
+  <body class="tasks-page">
     <header>
       <h1>Time Nest</h1>
-      <nav>
-        <a href="./index.html">Home</a>
+      <button id="hamburger-menu" title="Toggle menu">☰</button>
+      <nav id="navbar">
         <a href="./dashboard.html">Dashboard</a>
-        <a href="./habits.html">Habits</a>
+        <a href="./tasks.html" class="active-nav-link">Tasks</a>
+        <a href="./focus.html">Tools</a>
+        <a href="./profile.html">Profile</a>
         <button id="theme-toggle" title="Toggle theme">🌙</button>
+        <button id="logout-btn" class="logout-btn">Logout</button>
       </nav>
     </header>
     <main>
-      <section class="card">
-        <h2>Tasks</h2>
-        
-        <div class="filters">
-          <button class="active" data-filter="all">All Tasks</button>
-          <button data-filter="active">Active</button>
-          <button data-filter="completed">Completed</button>
+      <section class="grid tasks-layout">
+        <div class="card tasks-form-card">
+          <h2>Create Task</h2>
+          <p class="muted mb-1">Capture what you want to focus on next.</p>
+
+          <form id="task-form" novalidate>
+            <label>Title <input id="t-title" placeholder="e.g. Read a book" required /></label>
+            <label>Description <input id="t-desc" placeholder="Optional details" /></label>
+            <label>Priority
+              <select id="t-priority">
+                <option value="">None</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label>Due date <input id="t-due" type="date" /></label>
+            <button type="submit">Add Task</button>
+            <p id="tasks-error" class="muted error-text"></p>
+          </form>
         </div>
-        
-        <form id="task-form" style="margin-bottom:1.5rem;">
-          <label>Title <input id="t-title" required /></label>
-          <label>Description <input id="t-desc" /></label>
-          <label>Priority
-            <select id="t-priority">
-              <option value="">None</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </label>
-          <label>Due date <input id="t-due" type="date" /></label>
-          <button type="submit">Add Task</button>
-        </form>
-        <div id="tasks"></div>
+
+        <div class="card tasks-list-card">
+          <h2>Your Tasks</h2>
+          <div class="filters mb-1">
+            <button class="active" data-filter="all">All</button>
+            <button data-filter="active">Active</button>
+            <button data-filter="completed">Completed</button>
+          </div>
+          <div id="tasks"></div>
+        </div>
       </section>
     </main>
     <script src="./js/theme.js"></script>
+    <script src="./js/auth.js"></script>
     <script src="./js/tasks.js"></script>
+    <script>
+      // Hamburger menu toggle
+      const hamburger = document.getElementById('hamburger-menu');
+      const navbar = document.getElementById('navbar');
+      if (hamburger) {
+        hamburger.addEventListener('click', () => {
+          navbar.classList.toggle('active');
+        });
+
+        navbar.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            navbar.classList.remove('active');
+          });
+        });
+      }
+
+      // Logout button functionality
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          window.TimeNestAuth.logout();
+          window.location.href = './login.html';
+        });
+      }
+    </script>
   </body>
 </html>

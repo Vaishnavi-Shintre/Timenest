@@ -5,6 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Profile • Time Nest</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+            rel="stylesheet"
+        />
     <link rel="stylesheet" href="./css/style.css" />
 </head>
 
@@ -15,7 +21,7 @@
         <nav id="navbar">
             <a href="./dashboard.html">Dashboard</a>
             <a href="./tasks.html">Tasks</a>
-            <a href="./habits.html">Habits</a>
+            <a href="./focus.html">Tools</a>
             <a href="./profile.html" class="active-nav-link">Profile</a>
             <button id="theme-toggle" title="Toggle theme">🌙</button>
             <button id="logout-btn" class="logout-btn">Logout</button>
@@ -52,9 +58,34 @@
                     <input type="email" id="edit-email" placeholder="Enter your email" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="calendar-url">Google Calendar URL (Optional)</label>
-                    <input type="url" id="calendar-url" placeholder="Paste your Google Calendar embed URL">
+                    <label for="edit-username">Username</label>
+                    <input type="text" id="edit-username" placeholder="Choose a username" required>
                 </div>
+                <div class="form-group">
+                    <label for="edit-goal">Daily Focus Goal (minutes)</label>
+                    <input type="number" id="edit-goal" min="0" step="15" placeholder="e.g. 60">
+                </div>
+                <div class="form-group">
+                    <label for="edit-work-type">Work Type</label>
+                    <select id="edit-work-type">
+                        <option value="">Select...</option>
+                        <option value="student">Student</option>
+                        <option value="developer">Developer</option>
+                        <option value="professional">Professional</option>
+                        <option value="freelancer">Freelancer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-focus-method">Preferred Focus Method</label>
+                    <select id="edit-focus-method">
+                        <option value="">Select...</option>
+                        <option value="pomodoro">Pomodoro</option>
+                        <option value="deep-focus">Deep Focus</option>
+                        <option value="break-reminders">Break Reminders</option>
+                        <option value="ambient">Ambient Sounds</option>
+                    </select>
+                </div>
+                
                 <div class="form-actions">
                     <button type="submit" class="btn-save">Save Changes</button>
                     <button type="button" class="btn-cancel" id="cancel-edit-btn">Cancel</button>
@@ -62,59 +93,60 @@
             </form>
         </section>
 
-        <!-- Statistics -->
-        <section class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-label">Total Tasks</div>
-                <div class="stat-value" id="stat-tasks">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Completed</div>
-                <div class="stat-value" id="stat-completed">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">In Progress</div>
-                <div class="stat-value" id="stat-pending">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Completion Rate</div>
-                <div class="stat-value" id="stat-rate">0%</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Total Habits</div>
-                <div class="stat-value" id="stat-habits">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Best Streak</div>
-                <div class="stat-value" id="stat-streak">0</div>
-            </div>
-        </section>
-
-        <!-- Google Calendar Section -->
-        <section class="calendar-section">
-            <h2>📅 My Calendar</h2>
-            
-            <div class="calendar-setup-guide">
-                <h3>🔧 Setup Your Calendar</h3>
-                <p><strong>To display your Google Calendar without sign-in:</strong></p>
-                <ol>
-                    <li>Go to <a href="https://calendar.google.com/calendar/u/0/r/settings" target="_blank">Google Calendar Settings</a></li>
-                    <li>Select your calendar from the left sidebar</li>
-                    <li>Scroll to <strong>"Access permissions"</strong></li>
-                    <li>Check ✅ <strong>"Make available to public"</strong></li>
-                    <li>Scroll down to <strong>"Integrate calendar"</strong> section</li>
-                    <li>Copy the <strong>"Embed code"</strong> iframe src URL</li>
-                    <li>Click "Edit Profile" above and paste the URL in the Calendar URL field</li>
-                </ol>
-                <div class="calendar-note">
-                    <strong>⚠️ Note:</strong> Your calendar must be set to public to display here. Only share calendars you're comfortable making public.
+        <!-- Statistics & Gamification -->
+        <section class="grid section-grid-spaced">
+            <div>
+                <h2 class="mb-1-5">Productivity Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Tasks</div>
+                        <div class="stat-value" id="stat-tasks">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="stat-completed">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">In Progress</div>
+                        <div class="stat-value" id="stat-pending">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Completion Rate</div>
+                        <div class="stat-value" id="stat-rate">0%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Weekly Focus Time</div>
+                        <div class="stat-value" id="stat-weekly-focus">0h</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Streak</div>
+                        <div class="stat-value" id="stat-streak">0 days</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Productivity Score</div>
+                        <div class="stat-value" id="stat-score">0</div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="calendar-placeholder">
-                <div class="placeholder-icon">📅</div>
-                <p>Your Google Calendar will appear here once configured</p>
-                <p class="muted">Follow the setup guide above to connect your calendar</p>
+            <div>
+                <h2 class="mb-1-5">Badges & Achievements</h2>
+                <div id="badge-container" class="stats-grid-compact">
+                    <div class="stat-box">
+                        <div class="stat-label">Getting Started</div>
+                        <div class="stat-value">🏁</div>
+                        <p class="muted">Create your first task.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Consistency</div>
+                        <div class="stat-value">🔥</div>
+                        <p class="muted">Build a 3-day focus streak.</p>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Task Finisher</div>
+                        <div class="stat-value">✅</div>
+                        <p class="muted">Complete 10 tasks.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -124,7 +156,7 @@
             <div id="history-container">
                 <div class="empty-state">
                     <div class="empty-icon">📋</div>
-                    <p>No work history yet. Start by creating tasks or habits!</p>
+                    <p>No work history yet. Start by creating tasks!</p>
                 </div>
             </div>
         </section>
@@ -181,14 +213,15 @@
                 }
 
                 // Fetch tasks from API
-                const tasksRes = await fetch('/api/tasks', {
+                const tasksRes = await fetch('/api/tasks/', {
                     headers: { 'Authorization': `Bearer ${window.TimeNestAuth.getToken()}` }
                 });
 
                 if (tasksRes.ok) {
-                    const tasks = await tasksRes.json();
-                    const completed = tasks.filter(t => t.status === 'completed').length;
-                    const pending = tasks.filter(t => t.status !== 'completed').length;
+                    const body = await tasksRes.json();
+                    const tasks = body.items || [];
+                    const completed = tasks.filter(t => t.completed).length;
+                    const pending = tasks.filter(t => !t.completed).length;
                     const rate = tasks.length > 0 ? Math.round((completed / tasks.length) * 100) : 0;
 
                     document.getElementById('stat-tasks').textContent = tasks.length;
@@ -196,24 +229,15 @@
                     document.getElementById('stat-pending').textContent = pending;
                     document.getElementById('stat-rate').textContent = rate + '%';
 
+                    // Simple productivity score [0-100]
+                    const score = Math.min(100, rate + Math.min(completed * 5, 40));
+                    document.getElementById('stat-score').textContent = score;
+
                     // Display history
                     displayHistory(tasks);
                 }
 
-                // Fetch habits from API
-                const habitsRes = await fetch('/api/habits', {
-                    headers: { 'Authorization': `Bearer ${window.TimeNestAuth.getToken()}` }
-                });
-
-                if (habitsRes.ok) {
-                    const habits = await habitsRes.json();
-                    document.getElementById('stat-habits').textContent = habits.length;
-
-                    const maxStreak = habits.length > 0
-                        ? Math.max(...habits.map(h => h.streak || 0))
-                        : 0;
-                    document.getElementById('stat-streak').textContent = maxStreak;
-                }
+                
             } catch (err) {
                 console.error('Error loading profile:', err);
             }
@@ -264,10 +288,11 @@
                     document.getElementById('edit-name').value = email.split('@')[0];
                 }
                 
-                const savedCalendarUrl = localStorage.getItem('calendar-url-' + email);
-                if (savedCalendarUrl) {
-                    document.getElementById('calendar-url').value = savedCalendarUrl;
-                }
+                const savedProfile = JSON.parse(localStorage.getItem('timenest_profile_' + email) || '{}');
+                if (savedProfile.username) document.getElementById('edit-username').value = savedProfile.username;
+                if (savedProfile.goalMinutes) document.getElementById('edit-goal').value = savedProfile.goalMinutes;
+                if (savedProfile.workType) document.getElementById('edit-work-type').value = savedProfile.workType;
+                if (savedProfile.focusMethod) document.getElementById('edit-focus-method').value = savedProfile.focusMethod;
             }
         });
 
@@ -283,17 +308,24 @@
             
             const email = userRes.data.user.email;
             const newName = document.getElementById('edit-name').value;
-            const calendarUrl = document.getElementById('calendar-url').value;
+            const username = document.getElementById('edit-username').value;
+            const goalMinutes = parseInt(document.getElementById('edit-goal').value || '0', 10) || 0;
+            const workType = document.getElementById('edit-work-type').value;
+            const focusMethod = document.getElementById('edit-focus-method').value;
             
             // Save to localStorage
             localStorage.setItem('profile-name-' + email, newName);
-            if (calendarUrl) {
-                localStorage.setItem('calendar-url-' + email, calendarUrl);
-                
-                // Update calendar iframe
-                const iframe = document.getElementById('calendar-iframe');
-                iframe.src = calendarUrl;
-            }
+            const profileKey = 'timenest_profile_' + email;
+            const existing = JSON.parse(localStorage.getItem(profileKey) || '{}');
+            const updated = {
+                ...existing,
+                fullName: newName,
+                username,
+                goalMinutes,
+                workType,
+                focusMethod,
+            };
+            localStorage.setItem(profileKey, JSON.stringify(updated));
             
             // Update display
             document.getElementById('profile-name').textContent = newName;
@@ -315,11 +347,12 @@
                 if (savedName) {
                     document.getElementById('profile-name').textContent = savedName;
                 }
-                
-                // Load saved calendar URL
-                const savedCalendarUrl = localStorage.getItem('calendar-url-' + email);
-                if (savedCalendarUrl) {
-                    document.getElementById('calendar-iframe').src = savedCalendarUrl;
+                const savedProfile = JSON.parse(localStorage.getItem('timenest_profile_' + email) || '{}');
+                if (savedProfile.username) {
+                    document.getElementById('edit-username').value = savedProfile.username;
+                }
+                if (savedProfile.goalMinutes) {
+                    document.getElementById('edit-goal').value = savedProfile.goalMinutes;
                 }
             }
         }
@@ -338,11 +371,11 @@
             }
 
             // Sort by date, most recent first
-            const sorted = tasks.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            const sorted = tasks.sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
 
             container.innerHTML = sorted.map(task => {
-                const date = task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'N/A';
-                const statusBadge = task.status === 'completed'
+                const date = task.updated_at || task.created_at ? new Date(task.updated_at || task.created_at).toLocaleDateString() : 'N/A';
+                const statusBadge = task.completed
                     ? '<span class="history-badge badge-completed">✓ Completed</span>'
                     : '<span class="history-badge badge-pending">⏳ Pending</span>';
 

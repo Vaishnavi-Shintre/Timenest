@@ -25,14 +25,22 @@
   async function init() {
     const container = document.getElementById('tasks');
     const form = document.getElementById('task-form');
+    const errorEl = document.getElementById('tasks-error');
     let currentFilter = 'all';
     
+    const setError = (msg) => {
+      if (!errorEl) return;
+      errorEl.textContent = msg || '';
+    };
+
     const render = async () => {
       const res = await listTasks();
       if (!res.ok) {
         container.textContent = res.data?.error || `Failed to load tasks (${res.status})`;
+        setError('Could not load tasks. Please try again.');
         return;
       }
+      setError('');
       let items = res.data?.items || [];
       
       // Apply filter
@@ -76,17 +84,26 @@
             method: 'PUT',
             body: JSON.stringify({ completed: !isCompleted }),
           });
-          if (res.ok) await render();
-          else alert(res.data?.error || `Update failed (${res.status})`);
+          if (res.ok) {
+            card.classList.add('task-anim-complete');
+            setTimeout(render, 200);
+          } else {
+            setError(res.data?.error || `Update failed (${res.status})`);
+          }
         });
       });
       container.querySelectorAll('button[data-action="delete"]').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           if (!confirm('Delete this task?')) return;
           const id = e.currentTarget.getAttribute('data-id');
+          const card = e.currentTarget.closest('[data-id]');
           const res = await jsonFetch(`${API}/tasks/${id}`, { method: 'DELETE' });
-          if (res.ok) await render();
-          else alert(res.data?.error || `Delete failed (${res.status})`);
+          if (res.ok) {
+            if (card) card.classList.add('task-anim-delete');
+            setTimeout(render, 220);
+          } else {
+            setError(res.data?.error || `Delete failed (${res.status})`);
+          }
         });
       });
     };
@@ -118,7 +135,7 @@
         (e.target).reset();
         await render();
       } else {
-        alert(res.data?.error || `Create failed (${res.status})`);
+        setError(res.data?.error || `Could not create task (${res.status}).`);
       }
     });
 

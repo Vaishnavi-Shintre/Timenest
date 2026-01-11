@@ -5,10 +5,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Register • Time Nest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 
-<body>
+<body class="auth-page">
   <header>
     <h1>Time Nest</h1>
     <nav>
@@ -18,55 +24,106 @@
     </nav>
   </header>
   <main>
-    <section class="card">
-      <h2>Create Account</h2>
-      <form id="register-form">
-        <label>
-          Name
-          <input type="text" id="name" required />
-        </label>
-        <label>
-          <label>
-            Phone Number
-            <input type="tel" id="phone" required />
-          </label>
-          Email
-          <input type="email" id="email" required />
-        </label>
-        <label>
-          Password
-          <input type="password" id="password" required />
-        </label>
+    <section class="card auth-card">
+      <h2>Create your Time Nest</h2>
+      <p class="muted mb-1">Set up your account and define your focus goals.</p>
 
-        <button type="submit">Create account</button>
+      <form id="register-form" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="full-name">Full Name</label>
+          <input type="text" id="full-name" placeholder="Alex Johnson" required />
+          <p class="helper-text">This will be shown on your profile.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="alex" required />
+          <p class="helper-text">Used to personalize your workspace.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required />
+          <p class="helper-text">You'll use this to sign in.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input type="password" id="password" placeholder="••••••••" required />
+            <button type="button" id="toggle-register-password" class="ghost-btn">Show</button>
+          </div>
+          <p class="helper-text">Use at least 8 characters with a mix of letters and numbers.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="goal">Focus Goal (optional)</label>
+          <input type="text" id="goal" placeholder="e.g. Study 2 hours daily" />
+        </div>
+
+        <button type="submit" id="register-submit">Create account</button>
       </form>
-      <p id="register-status" class="muted"></p>
-      <p class="muted text-center">Already have an account? <a href="./login.html">Sign in</a></p>
+
+      <p id="register-status" class="muted mt-1"></p>
+      <p class="muted text-center mt-1">Already have an account? <a href="./login.html">Sign in</a></p>
     </section>
   </main>
+  <script src="./js/theme.js"></script>
   <script src="./js/auth.js"></script>
   <script>
-    const form = document.getElementById('register-form');
-    const statusEl = document.getElementById('register-status');
-    form.addEventListener('submit', async (e) => {
+    const registerForm = document.getElementById('register-form');
+    const registerStatus = document.getElementById('register-status');
+    const registerPasswordInput = document.getElementById('password');
+    const toggleRegisterPasswordBtn = document.getElementById('toggle-register-password');
+
+    toggleRegisterPasswordBtn.addEventListener('click', () => {
+      const isPassword = registerPasswordInput.type === 'password';
+      registerPasswordInput.type = isPassword ? 'text' : 'password';
+      toggleRegisterPasswordBtn.textContent = isPassword ? 'Hide' : 'Show';
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      statusEl.textContent = 'Submitting...';
+      registerStatus.textContent = '';
+
+      const fullName = document.getElementById('full-name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = registerPasswordInput.value;
+      const goal = document.getElementById('goal').value.trim();
+
+      if (!fullName || !username || !email || !password) {
+        registerStatus.textContent = 'Please fill in all required fields.';
+        return;
+      }
+
+      registerStatus.textContent = 'Creating your account…';
+      document.getElementById('register-submit').disabled = true;
+
       try {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
         const res = await window.TimeNestAuth.register(email, password);
         if (res.ok) {
-          statusEl.textContent = 'Account created! Redirecting...';
+          // Store basic profile preferences locally for now
+          const profileKey = 'timenest_profile_' + email;
+          const profile = {
+            fullName,
+            username,
+            goal,
+          };
+          localStorage.setItem(profileKey, JSON.stringify(profile));
+
+          registerStatus.textContent = 'Account created! Redirecting…';
           window.location.href = './login.html';
         } else {
-          statusEl.textContent = res.data?.error || `Registration failed (${res.status})`;
+          registerStatus.textContent = res.data?.error || `Registration failed (${res.status})`;
         }
       } catch (err) {
-        statusEl.textContent = 'Registration failed';
+        registerStatus.textContent = 'Registration failed. Please try again.';
+      } finally {
+        document.getElementById('register-submit').disabled = false;
       }
     });
   </script>
 </body>
-<script src="./js/theme.js"></script>
 
 </html>

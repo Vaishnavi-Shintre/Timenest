@@ -4,9 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login • Time Nest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./css/style.css" />
   </head>
-  <body>
+  <body class="auth-page">
     <header>
       <h1>Time Nest</h1>
       <nav>
@@ -15,45 +21,95 @@
       </nav>
     </header>
     <main>
-      <section class="card">
-        <h2>Login</h2>
-        <form id="login-form">
-          <label>
-            Email
-            <input type="email" id="email" required />
-          </label>
-          <label>
-            Password
-            <input type="password" id="password" required />
-          </label>
-          <button type="submit">Sign in</button>
+      <section class="card auth-card">
+        <h2>Welcome back</h2>
+        <p class="muted mb-1">Stay focused and ship your best work.</p>
+
+        <form id="login-form" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+            <p class="helper-text" id="email-help">Use the email you signed up with.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input type="password" id="password" placeholder="••••••••" required />
+              <button type="button" id="toggle-password" class="ghost-btn">Show</button>
+            </div>
+            <div class="auth-row-between">
+              <p class="helper-text" id="password-help">Minimum 8 characters recommended.</p>
+              <a href="#" class="link-muted">Forgot password?</a>
+            </div>
+          </div>
+
+          <button type="submit" class="mt-1" id="login-submit">Sign in</button>
+
+          <button type="button" class="secondary mt-1 auth-google-btn" id="google-signin">
+            <span class="google-icon">G</span>
+            <span>Sign in with Google</span>
+          </button>
         </form>
-        <p id="login-status" class="muted"></p>
-        <p class="muted text-center">Don't have an account? <a href="./register.html">Create one</a></p>
+
+        <p id="login-status" class="muted mt-1"></p>
+        <p class="muted text-center mt-1">
+          Don't have an account?
+          <a href="./register.html">Create one</a>
+        </p>
       </section>
     </main>
+    <script src="./js/theme.js"></script>
     <script src="./js/auth.js"></script>
     <script>
       const form = document.getElementById('login-form');
       const statusEl = document.getElementById('login-status');
+      const passwordInput = document.getElementById('password');
+      const togglePasswordBtn = document.getElementById('toggle-password');
+
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePasswordBtn.textContent = isPassword ? 'Hide' : 'Show';
+      });
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        statusEl.textContent = 'Submitting...';
+        statusEl.textContent = '';
+
+        const email = document.getElementById('email').value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          statusEl.textContent = 'Please fill in both email and password.';
+          return;
+        }
+
+        document.getElementById('login-submit').disabled = true;
+        statusEl.textContent = 'Signing you in…';
+
         try {
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
           const res = await window.TimeNestAuth.login(email, password);
           if (res.ok) {
-            statusEl.textContent = 'Signed in! Redirecting...';
+            statusEl.textContent = 'Signed in! Redirecting…';
             window.location.href = './dashboard.html';
           } else {
             statusEl.textContent = res.data?.error || `Login failed (${res.status})`;
           }
         } catch (err) {
-          statusEl.textContent = 'Login failed';
+          statusEl.textContent = 'Something went wrong. Please try again.';
+        } finally {
+          document.getElementById('login-submit').disabled = false;
         }
       });
+
+      const googleBtn = document.getElementById('google-signin');
+      if (googleBtn) {
+        googleBtn.addEventListener('click', () => {
+          // Start Google OAuth 2.0 login flow handled by the backend
+          window.location.href = '/auth/google';
+        });
+      }
     </script>
   </body>
-  <script src="./js/theme.js"></script>
 </html>

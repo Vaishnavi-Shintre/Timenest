@@ -1,114 +1,153 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard • Time Nest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 
 <body>
-  <header>
-    <h1>Time Nest</h1>
-    <button id="hamburger-menu" title="Toggle menu">☰</button>
-    <nav id="navbar">
-      <a href="./index.html">Home</a>
-      <a href="./tasks.html">Tasks</a>
-      <a href="./habits.html">Habits</a>
-      <a href="./profile.html">Profile</a>
-      <button id="theme-toggle" title="Toggle theme">🌙</button>
-      <button id="logout-btn" class="logout-btn">Logout</button>
-    </nav>
-  </header>
-  <main>
-    <h2 class="welcome-title">Welcome Back! 👋</h2>
+<header>
+  <h1>Time Nest</h1>
+  <button id="hamburger-menu">☰</button>
+  <nav id="navbar">
+    <a href="./dashboard.html" class="active-nav-link">Dashboard</a>
+    <a href="./tasks.html">Tasks</a>
+    <a href="./focus.html">Tools</a>
+    <a href="./profile.html">Profile</a>
+    <button id="theme-toggle">🌙</button>
+    <button id="logout-btn" class="logout-btn">Logout</button>
+  </nav>
+</header>
 
-    <!-- First Row: Profile & Tools to Focus -->
-    <section class="grid">
-      <div class="card">
-        <h3>Profile</h3>
-        <div id="profile-info" class="mt-1-5">
-          <div class="text-center mb-1-5">
-            <div class="profile-avatar">
-              <span id="user-avatar">U</span>
-            </div>
+<main>
+  <h2 class="welcome-title">Welcome back! 👋</h2>
+
+  <!-- Stats -->
+  <section class="grid dashboard-stats">
+    <div class="card stat-card">
+      <div class="stat-label">Total Tasks</div>
+      <div class="stat-value" id="stat-total-tasks">0</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value" id="stat-completed-tasks">0</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">In Progress</div>
+      <div class="stat-value" id="stat-inprogress-tasks">0</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Completion Rate</div>
+      <div class="stat-value" id="stat-completion-rate">0%</div>
+    </div>
+  </section>
+
+  <!-- Profile + Focus Summary -->
+  <section class="grid section-grid-spaced">
+    <div class="card">
+      <h3>Profile</h3>
+      <div class="text-center mt-1-5">
+        <div class="profile-avatar">
+          <span id="user-avatar">U</span>
+        </div>
+        <div id="user-name">User</div>
+        <div class="muted" id="user-email">user@email.com</div>
+        <a href="./profile.html">
+          <button class="secondary mt-1">View Profile</button>
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Today’s Focus</h3>
+      <div class="focus-summary-grid mt-1-5">
+        <div>
+          <div class="stat-label">Focus time</div>
+          <div class="stat-value" id="focus-time-today">0m</div>
+        </div>
+        <div>
+          <div class="stat-label">Streak</div>
+          <div class="stat-value" id="focus-streak">0 days</div>
+        </div>
+      </div>
+      <div class="focus-session" id="focus-session-detail" aria-live="polite">
+        <div class="focus-session-header">
+          <div>
+            <div class="stat-label">Active session</div>
+            <div class="focus-session-name" id="focus-session-name">No session running</div>
           </div>
-          <a href="./profile.html" class="action-link">
-            <button class="secondary mt-1">View Full Profile</button>
-          </a>
+          <div class="focus-session-timer" id="focus-session-timer">00:00</div>
+        </div>
+        <p class="muted" id="focus-session-meta">Start a focus tool below to get into deep work.</p>
+        <div class="focus-session-controls" id="focus-session-controls">
+          <button class="ghost-btn" id="focus-session-pause" type="button">Pause</button>
+          <button class="secondary" id="focus-session-stop" type="button">Stop</button>
         </div>
       </div>
-      <div class="card">
-        <h3>Tools to Focus</h3>
-        <div id="focus-tools" class="mt-1">
-          <p class="muted">Your productivity tools and resources will appear here.</p>
-        </div>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Second Row: To Do & Quick Actions -->
-    <section class="grid section-grid-spaced">
-      <div class="card">
-        <h3>To Do</h3>
-        <div id="todo-list" class="mt-1">
-          <p class="muted">No tasks yet. <a href="./tasks.html">Create one</a></p>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Quick Actions</h3>
-        <div class="action-buttons mt-1">
-          <a href="./tasks.html" class="action-link">
-            <button class="secondary">📝 Manage Tasks</button>
-          </a>
-          <a href="./habits.html" class="action-link">
-            <button class="secondary">🎯 Track Habits</button>
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
-  <script src="./js/theme.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/dashboard.js"></script>
-  <script>
-    // Hamburger menu toggle
-    const hamburger = document.getElementById('hamburger-menu');
-    const navbar = document.getElementById('navbar');
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        navbar.classList.toggle('active');
-      });
+  <!-- Todo + Focus Tools -->
+  <section class="grid section-grid-spaced">
+    <div class="card">
+      <h3>Daily To-Do</h3>
+      <form id="dashboard-task-form" class="inline-form mt-1">
+        <input type="text" id="dash-task-title" placeholder="Quick task…" required />
+        <select id="dash-task-priority">
+          <option value="">Priority</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <button type="submit">Add</button>
+      </form>
 
-      // Close menu when a link is clicked
-      navbar.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          navbar.classList.remove('active');
-        });
-      });
+      <div id="dashboard-todo-list" class="mt-1">
+        <p class="muted">No tasks yet.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Find Focus Tools</h3>
+      <p class="muted mb-1">Start a session without leaving the dashboard.</p>
+      <div id="focus-tools" class="focus-tools-grid"></div>
+    </div>
+  </section>
+</main>
+
+<script src="./js/theme.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/dashboard.js"></script>
+
+<script>
+  const hamburger = document.getElementById("hamburger-menu");
+  const navbar = document.getElementById("navbar");
+
+  hamburger.onclick = () => navbar.classList.toggle("active");
+
+  document.getElementById("logout-btn").onclick = () => {
+    window.TimeNestAuth.logout();
+    window.location.href = "./login.html";
+  };
+
+  async function loadProfile() {
+    const res = await window.TimeNestAuth.me();
+    if (res.ok) {
+      const email = res.data.user.email;
+      document.getElementById("user-email").textContent = email;
+      document.getElementById("user-name").textContent = email.split("@")[0];
+      document.getElementById("user-avatar").textContent = email[0].toUpperCase();
     }
-
-    // Logout button functionality
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        window.TimeNestAuth.logout();
-        window.location.href = './login.html';
-      });
-    }
-
-    // Load user profile info
-    async function loadUserProfile() {
-      const res = await window.TimeNestAuth.me();
-      if (res.ok && res.data.user) {
-        const email = res.data.user.email;
-        document.getElementById('user-email').textContent = email;
-        document.getElementById('user-name').textContent = email.split('@')[0];
-        document.getElementById('user-avatar').textContent = email.charAt(0).toUpperCase();
-      }
-    }
-
-    loadUserProfile();
-  </script>
-
+  }
+  loadProfile();
+</script>
+</body>
 </html>
