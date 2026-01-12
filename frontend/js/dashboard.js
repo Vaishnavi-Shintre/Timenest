@@ -376,6 +376,28 @@
     });
   }
 
+  function getLocalTimeLabel() {
+    return new Date().toLocaleTimeString(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  }
+
+  let dashboardFeedbackTimeout = null;
+
+  function setDashboardFeedback(message) {
+    const el = document.getElementById('dashboard-task-feedback');
+    if (!el) return;
+    el.textContent = message;
+    el.style.opacity = '1';
+    if (dashboardFeedbackTimeout) {
+      clearTimeout(dashboardFeedbackTimeout);
+    }
+    dashboardFeedbackTimeout = setTimeout(() => {
+      el.style.opacity = '0.7';
+    }, 4000);
+  }
+
   async function renderTasksAndStats() {
     const res = await listTasks();
     const items = res.ok ? (res.data?.items || []) : [];
@@ -395,10 +417,10 @@
     if (inProgressEl) inProgressEl.textContent = inProgress;
     if (rateEl) rateEl.textContent = `${rate}%`;
 
-    // Daily To-Do: tasks due today or without due date and not completed
+    // Daily To-Do: tasks due today or without due date
     const today = new Date().toISOString().slice(0, 10);
-    const daily = items.filter(t => {
-      if (t.completed) return false;
+    const nowMs = Date.now();
+    const dailyCandidates = items.filter(t => {
       if (!t.due_date) return true;
       const d = (t.due_date || '').slice(0, 10);
       return d === today;
@@ -408,7 +430,7 @@
     const emptyEl = document.getElementById('dashboard-empty-state');
     if (!listEl) return;
 
-    if (!daily.length) {
+    if (!dailyCandidates.length) {
       listEl.innerHTML = '';
       if (emptyEl) {
         emptyEl.style.display = 'block';
@@ -420,11 +442,18 @@
     if (emptyEl) emptyEl.style.display = 'none';
 
     const priorityOrder = { high: 3, medium: 2, low: 1, '': 0 };
-    daily.sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0));
+    const sorted = [...dailyCandidates].sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0));
 
-    listEl.innerHTML = daily.map(t => {
+    const active = sorted.filter(t => !t.completed);
+    const completedDaily = sorted.filter(t => t.completed);
+
+    let html = '';
+
+    html += active.map(t => {
       const priority = t.priority || '';
       const pillClass = priority ? `pill-priority pill-${priority}` : '';
+      const dueMs = t.due_date ? new Date(t.due_date).getTime() : null;
+      const isOverdue = dueMs && dueMs < nowMs;
       return `
         <div class="todo-item" data-id="${t.id}">
           <label class="todo-main">
@@ -433,11 +462,40 @@
           </label>
           <div class="todo-meta">
             ${priority ? `<span class="${pillClass}">${priority}</span>` : ''}
+            ${isOverdue ? '<span class="pill-overdue">Overdue</span>' : ''}
             <button class="ghost-btn todo-delete" type="button">✕</button>
           </div>
         </div>
       `;
     }).join('');
+
+    if (completedDaily.length) {
+      html += `
+        <div class="todo-divider">Completed</div>
+      `;
+
+      html += completedDaily.map(t => {
+        const priority = t.priority || '';
+        const pillClass = priority ? `pill-priority pill-${priority}` : '';
+        const dueMs = t.due_date ? new Date(t.due_date).getTime() : null;
+        const isOverdue = dueMs && dueMs < nowMs;
+        return `
+          <div class="todo-item todo-item--completed" data-id="${t.id}">
+            <label class="todo-main">
+              <input type="checkbox" class="todo-checkbox" ${t.completed ? 'checked' : ''} />
+              <span class="todo-title">${t.title}</span>
+            </label>
+            <div class="todo-meta">
+              ${priority ? `<span class="${pillClass}">${priority}</span>` : ''}
+              ${isOverdue ? '<span class="pill-overdue">Overdue</span>' : ''}
+              <button class="ghost-btn todo-delete" type="button">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    listEl.innerHTML = html;
 
     listEl.querySelectorAll('.todo-checkbox').forEach(cb => {
       cb.addEventListener('change', async e => {
@@ -449,6 +507,9 @@
           e.target.checked = !checked;
           alert(res.data?.error || `Update failed (${res.status})`);
         } else {
+          setDashboardFeedback(checked
+            ? `Task completed at ${getLocalTimeLabel()}.`
+            : `Task reopened at ${getLocalTimeLabel()}.`);
           renderTasksAndStats();
         }
       });
@@ -463,6 +524,7 @@
         if (!res.ok) {
           alert(res.data?.error || `Delete failed (${res.status})`);
         } else {
+          setDashboardFeedback('Task deleted.');
           renderTasksAndStats();
         }
       });
@@ -496,6 +558,7 @@
 
       titleInput.value = '';
       prioritySelect.value = '';
+      setDashboardFeedback(`Task added for today at ${getLocalTimeLabel()}.`);
       renderTasksAndStats();
     });
   }

@@ -42,6 +42,7 @@
             </div>
             <div class="profile-name" id="profile-name">User Name</div>
             <div class="profile-email" id="profile-email">user@example.com</div>
+            <div class="profile-status" id="profile-status">New member</div>
             <button class="profile-edit-btn" id="edit-profile-btn">✏️ Edit Profile</button>
         </section>
 
@@ -130,21 +131,31 @@
             </div>
             <div>
                 <h2 class="mb-1-5">Badges &amp; Achievements</h2>
+                <p class="muted badge-helper">Complete tasks and focus sessions to unlock badges.</p>
                 <div id="badge-container" class="stats-grid-compact badges-grid">
                     <div class="badge-card badge-locked">
-                        <div class="badge-icon">🏁</div>
+                        <div class="badge-card-header">
+                            <div class="badge-icon">🏁</div>
+                            <span class="badge-lock" aria-hidden="true">🔒</span>
+                        </div>
                         <div class="badge-title">Getting Started</div>
                         <p class="badge-description">Create your first task.</p>
                         <p class="badge-status">Locked</p>
                     </div>
                     <div class="badge-card badge-locked">
-                        <div class="badge-icon">🔥</div>
+                        <div class="badge-card-header">
+                            <div class="badge-icon">🔥</div>
+                            <span class="badge-lock" aria-hidden="true">🔒</span>
+                        </div>
                         <div class="badge-title">Consistency</div>
                         <p class="badge-description">Build a 3-day focus streak.</p>
                         <p class="badge-status">Locked</p>
                     </div>
                     <div class="badge-card badge-locked">
-                        <div class="badge-icon">✅</div>
+                        <div class="badge-card-header">
+                            <div class="badge-icon">✅</div>
+                            <span class="badge-lock" aria-hidden="true">🔒</span>
+                        </div>
                         <div class="badge-title">Task Finisher</div>
                         <p class="badge-description">Complete 10 tasks.</p>
                         <p class="badge-status">Locked</p>
@@ -160,12 +171,61 @@
                 <div class="empty-state">
                     <div class="empty-icon">📋</div>
                     <p>No work history yet. Start by creating tasks!</p>
+                    <p class="muted">Your activity will appear here once you start working.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reminder Settings -->
+        <section class="reminder-settings-section">
+            <div class="card reminder-card">
+                <h2 class="mb-1">Reminder Settings</h2>
+                <p class="muted mb-1">TimeNest can gently nudge you when tasks with due times are coming up.</p>
+
+                <div class="reminder-row">
+                    <div class="reminder-option">
+                        <div class="reminder-icon" aria-hidden="true">🔊</div>
+                        <div>
+                            <div class="reminder-label">Voice reminders</div>
+                            <p class="muted small-label">Spoken alert when a task reaches its due time.</p>
+                            <p class="muted tiny-helper">Works only for tasks with a due date &amp; time.</p>
+                        </div>
+                    </div>
+                    <label class="reminder-toggle">
+                        <input type="checkbox" id="reminder-voice-toggle" />
+                        <span class="reminder-toggle-slider" aria-hidden="true"></span>
+                    </label>
+                </div>
+
+                <div class="reminder-row">
+                    <div class="reminder-option">
+                        <div class="reminder-icon" aria-hidden="true">🔔</div>
+                        <div>
+                            <div class="reminder-label">Browser notifications</div>
+                            <p class="muted small-label">System notifications before and at the due time.</p>
+                        </div>
+                    </div>
+                    <label class="reminder-toggle">
+                        <input type="checkbox" id="reminder-notification-toggle" />
+                        <span class="reminder-toggle-slider" aria-hidden="true"></span>
+                    </label>
+                </div>
+
+                <div class="reminder-divider"></div>
+
+                <p id="reminder-status" class="muted small-label mt-1"></p>
+
+                <div class="reminder-test-row">
+                    <button type="button" id="reminder-test-btn" class="secondary reminder-test-btn">
+                        ⏰ Test Reminder
+                    </button>
                 </div>
             </div>
         </section>
 
     <script src="./js/theme.js"></script>
     <script src="./js/auth.js"></script>
+    <script src="./js/reminders.js"></script>
     <script>
         // Hamburger menu toggle
         const hamburger = document.getElementById('hamburger-menu');
@@ -394,8 +454,68 @@
             }).join('');
         }
 
+        function initReminderSettings() {
+            const api = window.TimeNestReminders;
+            if (!api) return;
+
+            const voiceToggle = document.getElementById('reminder-voice-toggle');
+            const notifToggle = document.getElementById('reminder-notification-toggle');
+            const statusEl = document.getElementById('reminder-status');
+            const testBtn = document.getElementById('reminder-test-btn');
+
+            function renderStatus() {
+                const status = api.getStatus();
+                if (voiceToggle) voiceToggle.checked = !!status.voiceEnabled;
+                if (notifToggle) notifToggle.checked = status.notificationsEnabled !== false;
+
+                if (!statusEl) return;
+                let text = '';
+                const blocked = status.notificationsSupported && status.permission === 'denied';
+
+                if (!status.notificationsSupported) {
+                    text = 'Notifications: Not supported in this browser.';
+                } else if (blocked) {
+                    text = 'Notifications: Blocked in browser settings. Voice reminders are disabled until you allow notifications for this site.';
+                } else if (status.permission === 'granted' && status.notificationsEnabled !== false) {
+                    text = 'Notifications: Allowed.';
+                } else if (status.permission === 'granted' && status.notificationsEnabled === false) {
+                    text = 'Notifications: Disabled in TimeNest.';
+                } else {
+                    text = 'Notifications: Waiting for browser permission.';
+                }
+                if (voiceToggle) {
+                    voiceToggle.disabled = !!blocked;
+                }
+                statusEl.textContent = text;
+            }
+
+            if (voiceToggle) {
+                voiceToggle.addEventListener('change', (e) => {
+                    api.toggleVoiceReminders(e.target.checked);
+                    renderStatus();
+                });
+            }
+
+            if (notifToggle) {
+                notifToggle.addEventListener('change', (e) => {
+                    api.toggleNotifications(e.target.checked);
+                    renderStatus();
+                });
+            }
+
+            if (testBtn) {
+                testBtn.addEventListener('click', async () => {
+                    await api.testNotification();
+                    renderStatus();
+                });
+            }
+
+            renderStatus();
+        }
+
         loadProfile();
         loadSavedProfile();
+        initReminderSettings();
     </script>
 </body>
 
