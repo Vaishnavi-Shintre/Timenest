@@ -132,35 +132,7 @@
             <div>
                 <h2 class="mb-1-5">Badges &amp; Achievements</h2>
                 <p class="muted badge-helper">Complete tasks and focus sessions to unlock badges.</p>
-                <div id="badge-container" class="stats-grid-compact badges-grid">
-                    <div class="badge-card badge-locked">
-                        <div class="badge-card-header">
-                            <div class="badge-icon">🏁</div>
-                            <span class="badge-lock" aria-hidden="true">🔒</span>
-                        </div>
-                        <div class="badge-title">Getting Started</div>
-                        <p class="badge-description">Create your first task.</p>
-                        <p class="badge-status">Locked</p>
-                    </div>
-                    <div class="badge-card badge-locked">
-                        <div class="badge-card-header">
-                            <div class="badge-icon">🔥</div>
-                            <span class="badge-lock" aria-hidden="true">🔒</span>
-                        </div>
-                        <div class="badge-title">Consistency</div>
-                        <p class="badge-description">Build a 3-day focus streak.</p>
-                        <p class="badge-status">Locked</p>
-                    </div>
-                    <div class="badge-card badge-locked">
-                        <div class="badge-card-header">
-                            <div class="badge-icon">✅</div>
-                            <span class="badge-lock" aria-hidden="true">🔒</span>
-                        </div>
-                        <div class="badge-title">Task Finisher</div>
-                        <p class="badge-description">Complete 10 tasks.</p>
-                        <p class="badge-status">Locked</p>
-                    </div>
-                </div>
+                <div id="badge-container" class="stats-grid-compact badges-grid"></div>
             </div>
         </section>
 
@@ -251,6 +223,150 @@
             });
         }
 
+        const FOCUS_STORAGE_KEY = 'timenest_focus_tools_v1';
+        const BADGES_STORAGE_KEY = 'timenest_badges_v1';
+
+        const BADGES_CONFIG = [
+            {
+                id: 'getting-started',
+                icon: '🏁',
+                title: 'Getting Started',
+                description: 'Create your first task.',
+                lockedText: 'Locked',
+                unlockedText: 'Unlocked by creating a task.',
+            },
+            {
+                id: 'consistency',
+                icon: '🔥',
+                title: 'Consistency',
+                description: 'Build a 3-day focus streak.',
+                lockedText: 'Locked',
+                unlockedText: 'Unlocked with a 3-day streak.',
+            },
+            {
+                id: 'task-finisher',
+                icon: '✅',
+                title: 'Task Finisher',
+                description: 'Complete 10 tasks.',
+                lockedText: 'Locked',
+                unlockedText: 'Unlocked by completing 10 tasks.',
+            },
+        ];
+
+        function loadFocusState() {
+            try {
+                return JSON.parse(localStorage.getItem(FOCUS_STORAGE_KEY)) || { tools: {}, history: {} };
+            } catch {
+                return { tools: {}, history: {} };
+            }
+        }
+
+        function todayKey() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function getStreakDays(state) {
+            const keys = Object.keys(state.history || {}).sort();
+            if (!keys.length) return 0;
+            let streak = 0;
+            let current = new Date(todayKey());
+            while (true) {
+                const key = current.toISOString().slice(0, 10);
+                const minutes = state.history[key]?.totalMinutes || 0;
+                if (minutes >= 25) {
+                    streak += 1;
+                    current.setDate(current.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        function getWeeklyFocusHours(state) {
+            let totalMinutes = 0;
+            const base = new Date(todayKey());
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(base);
+                d.setDate(base.getDate() - i);
+                const key = d.toISOString().slice(0, 10);
+                totalMinutes += state.history[key]?.totalMinutes || 0;
+            }
+            return totalMinutes / 60;
+        }
+
+        function loadBadgesState() {
+            try {
+                return JSON.parse(localStorage.getItem(BADGES_STORAGE_KEY)) || { badges: {} };
+            } catch {
+                return { badges: {} };
+            }
+        }
+
+        function saveBadgesState(state) {
+            localStorage.setItem(BADGES_STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function computeBadgeUnlockedNow(cfg, stats) {
+            if (cfg.id === 'getting-started') {
+                return stats.totalTasks > 0;
+            }
+            if (cfg.id === 'task-finisher') {
+                return stats.completedTasks >= 10;
+            }
+            if (cfg.id === 'consistency') {
+                return stats.focusStreak >= 3;
+            }
+            return false;
+        }
+
+        function renderBadges(state) {
+            const container = document.getElementById('badge-container');
+            if (!container) return;
+
+            const html = BADGES_CONFIG.map(cfg => {
+                const unlocked = !!state.badges?.[cfg.id];
+                const statusClass = unlocked ? 'badge-unlocked' : 'badge-locked';
+                const statusText = unlocked ? (cfg.unlockedText || 'Unlocked') : (cfg.lockedText || 'Locked');
+                const lockIcon = unlocked ? '' : '🔒';
+                return `
+                    <div class="badge-card ${statusClass}">
+                        <div class="badge-card-header">
+                            <div class="badge-icon">${cfg.icon}</div>
+                            <span class="badge-lock" aria-hidden="true">${lockIcon}</span>
+                        </div>
+                        <div class="badge-title">${cfg.title}</div>
+                        <p class="badge-description">${cfg.description}</p>
+                        <p class="badge-status">${statusText}</p>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        function updateBadgesFromStats(taskCount, completedCount, focusStreak) {
+            let state = loadBadgesState();
+            if (!state.badges) state.badges = {};
+
+            const stats = {
+                totalTasks: taskCount,
+                completedTasks: completedCount,
+                focusStreak: focusStreak || 0,
+            };
+
+            BADGES_CONFIG.forEach(cfg => {
+                const alreadyUnlocked = !!state.badges[cfg.id];
+                const shouldUnlock = computeBadgeUnlockedNow(cfg, stats);
+                if (shouldUnlock && !alreadyUnlocked) {
+                    state.badges[cfg.id] = { unlockedAt: new Date().toISOString() };
+                }
+            });
+
+            saveBadgesState(state);
+            renderBadges(state);
+        }
+
         // Load user profile and statistics
         async function loadProfile() {
             try {
@@ -298,6 +414,16 @@
 
                     // Display history
                     displayHistory(tasks);
+
+                    // Focus stats based on local focus history
+                    const focusState = loadFocusState();
+                    const streak = getStreakDays(focusState);
+                    const weeklyHours = getWeeklyFocusHours(focusState);
+                    document.getElementById('stat-streak').textContent = `${streak} day${streak === 1 ? '' : 's'}`;
+                    document.getElementById('stat-weekly-focus').textContent = `${weeklyHours.toFixed(1)}h`;
+
+                    // Update badges based on tasks and focus
+                    updateBadgesFromStats(tasks.length, completed, streak);
                 }
 
                 
