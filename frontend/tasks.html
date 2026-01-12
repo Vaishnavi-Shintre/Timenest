@@ -43,7 +43,8 @@
               </select>
             </label>
             <label>Due date <input id="t-due" type="date" /></label>
-            <p class="muted small-label">Reminders are sent only for tasks with a due date (and time when available).</p>
+            <label>Due time <input id="t-due-time" type="time" /></label>
+            <p id="t-reminder-hint" class="muted small-label">Reminders are sent only for tasks with a due date and time.</p>
             <button type="submit">Add Task</button>
             <p id="tasks-error" class="muted error-text"></p>
           </form>

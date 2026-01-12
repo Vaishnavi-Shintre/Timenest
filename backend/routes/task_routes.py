@@ -31,14 +31,26 @@ def create_task():
         return jsonify(error="Title is required"), 400
     description = payload.get("description")
     priority = payload.get("priority")  # low | medium | high
-    due_date = payload.get("due_date")  # ISO string
+    # Support either a full ISO timestamp in due_date, or a separate
+    # date (YYYY-MM-DD) plus due_time (HH:MM). This keeps backwards
+    # compatibility with existing clients.
+    due_date = payload.get("due_date")
+    due_time = payload.get("due_time")
+
+    due_dt = None
     if due_date:
-        try:
-            due_dt = datetime.fromisoformat(due_date)
-        except ValueError:
-            return jsonify(error="Invalid due_date format"), 400
-    else:
-        due_dt = None
+        if due_time:
+            # Combine date and time, e.g. "2025-01-12T14:30"
+            try:
+                due_dt = datetime.fromisoformat(f"{due_date}T{due_time}")
+            except ValueError:
+                return jsonify(error="Invalid due_date or due_time format"), 400
+        else:
+            # Fallback: accept original ISO-style string in due_date
+            try:
+                due_dt = datetime.fromisoformat(due_date)
+            except ValueError:
+                return jsonify(error="Invalid due_date format"), 400
 
     db = get_db()
     doc = {
@@ -46,6 +58,7 @@ def create_task():
         "description": description,
         "priority": priority,
         "due_date": due_dt,
+        "due_time": due_time,
         "completed": False,
         "user_id": user_id,
         "created_at": datetime.utcnow(),
@@ -65,14 +78,33 @@ def update_task(task_id):
     for field in ["title", "description", "priority", "completed"]:
         if field in payload:
             updates[field] = payload[field]
-    if "due_date" in payload:
-        if payload["due_date"] is None:
+    # Handle due date/time updates. Like create_task, we support either a
+    # full ISO timestamp in due_date or a date plus due_time.
+    if "due_date" in payload or "due_time" in payload:
+        raw_date = payload.get("due_date")
+        raw_time = payload.get("due_time")
+
+        if raw_date is None and raw_time is None:
             updates["due_date"] = None
-        else:
+            updates["due_time"] = None
+        elif raw_date is not None and raw_time:
             try:
-                updates["due_date"] = datetime.fromisoformat(payload["due_date"])
+                updates["due_date"] = datetime.fromisoformat(f"{raw_date}T{raw_time}")
+            except ValueError:
+                return jsonify(error="Invalid due_date or due_time format"), 400
+            updates["due_time"] = raw_time
+        elif raw_date is not None and (raw_time is None or raw_time == ""):
+            # Date only (reminders will be disabled by frontend when no time is set)
+            try:
+                updates["due_date"] = datetime.fromisoformat(str(raw_date))
             except ValueError:
                 return jsonify(error="Invalid due_date format"), 400
+            updates["due_time"] = None
+        elif raw_date is None and raw_time:
+            # Only time provided: keep date as-is, but we cannot safely
+            # reconstruct it here without another DB round-trip. For now,
+            # just store the time string and leave existing due_date.
+            updates["due_time"] = raw_time
     if not updates:
         return jsonify(error="No valid fields to update"), 400
     updates["updated_at"] = datetime.utcnow()

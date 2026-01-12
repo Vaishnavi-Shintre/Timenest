@@ -56,7 +56,12 @@
       
       container.innerHTML = items.map(t => {
         const priorityBadge = t.priority ? `<span class="badge badge-${t.priority}">${t.priority}</span>` : '';
-        const dueDate = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
+        const hasDue = !!t.due_date;
+        const dueDate = hasDue ? new Date(t.due_date).toLocaleDateString() : 'No due date';
+        const dueTime = t.due_time || '';
+        const dueLabel = hasDue
+          ? (dueTime ? `${dueDate} • ${dueTime}` : dueDate)
+          : 'No due date';
         return `
         <div class="task-item ${t.completed ? 'completed' : ''}" data-id="${t.id}">
           <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem;">
@@ -64,7 +69,7 @@
             ${priorityBadge}
           </div>
           ${t.description ? `<div class="muted" style="margin-bottom:0.5rem;">${t.description}</div>` : ''}
-          <div class="muted" style="font-size:0.85rem;">Due: ${dueDate}</div>
+          <div class="muted" style="font-size:0.85rem;">Due: ${dueLabel}</div>
           <div class="btn-group">
             <button class="${t.completed ? 'secondary' : 'success'}" data-action="toggle" data-id="${t.id}">
               ${t.completed ? '↩️ Reopen' : '✓ Complete'}
@@ -118,17 +123,43 @@
       });
     });
 
+    const dateInput = document.getElementById('t-due');
+    const timeInput = document.getElementById('t-due-time');
+    const reminderHint = document.getElementById('t-reminder-hint');
+
+    const updateReminderHint = () => {
+      if (!reminderHint) return;
+      const hasDate = !!(dateInput && dateInput.value);
+      const hasTime = !!(timeInput && timeInput.value);
+      if (!hasDate && !hasTime) {
+        reminderHint.textContent = 'Add a due date and time to receive reminders for this task.';
+      } else if (hasDate && !hasTime) {
+        reminderHint.textContent = 'Add a time to receive reminders for this task.';
+      } else if (hasDate && hasTime) {
+        reminderHint.textContent = 'This task will send reminders before and at the due time.';
+      } else {
+        reminderHint.textContent = 'Reminders are sent only for tasks with a due date and time.';
+      }
+    };
+
+    if (dateInput) dateInput.addEventListener('change', updateReminderHint);
+    if (timeInput) timeInput.addEventListener('change', updateReminderHint);
+    updateReminderHint();
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('t-title').value;
       const description = document.getElementById('t-desc').value;
       const priority = document.getElementById('t-priority').value;
       const dueDate = document.getElementById('t-due').value;
+      const dueTime = document.getElementById('t-due-time').value;
       const payload = {
         title,
         description: description || undefined,
         priority: priority || undefined,
-        due_date: dueDate ? new Date(dueDate).toISOString() : undefined,
+        // Send date and time separately so the backend can combine them
+        due_date: dueDate || undefined,
+        due_time: dueTime || undefined,
       };
       const res = await createTask(payload);
       if (res.ok) {

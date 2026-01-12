@@ -190,10 +190,38 @@ input, select, button {
   font-family: inherit;
 }
 
-/* Make dropdown boxes stand out with a darker base and blue accent */
+/* Make dropdown boxes stand out in dark theme, but keep them readable in light theme */
 select {
   background: #020617; /* near-black to match dark theme */
   border-color: #1d4ed8; /* blue border */
+}
+
+/* In light mode, inputs and selects should have a light background so text stays visible */
+[data-theme="light"] input,
+[data-theme="light"] select {
+  background: #e5e7eb; /* soft light gray on white card */
+  color: var(--text);
+}
+
+/* Date & time pickers: ensure icons and text are visible in dark theme */
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+[data-theme="light"] input[type="date"],
+[data-theme="light"] input[type="time"] {
+  color-scheme: light;
+}
+
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="light"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: none;
 }
 
 input:focus, select:focus {
@@ -551,6 +579,16 @@ button.secondary {
   background: rgba(15, 23, 42, 0.9);
 }
 
+/* Light theme tweaks so todo rows sit nicely on the white card */
+[data-theme="light"] .todo-item {
+  background: #e5e7eb; /* light slate gray strip */
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+[data-theme="light"] .todo-item:hover {
+  background: #dbe3f0;
+}
+
 .todo-item--completed {
   opacity: 0.6;
 }
@@ -647,6 +685,12 @@ button.secondary {
   padding: 1rem 1.25rem;
 }
 
+/* Light theme: softer tiles for Focus Time / Streak summary */
+[data-theme="light"] .focus-summary-item {
+  background: #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
 .focus-session {
   margin-top: 1rem;
   padding: 1rem 1.25rem;
@@ -701,6 +745,26 @@ button.secondary {
   box-shadow: 0 10px 32px rgba(52, 211, 153, 0.4);
 }
 
+/* Light theme variant for the active focus session bar */
+[data-theme="light"] .focus-session {
+  background: #e5f9f4; /* soft mint to match glow but keep text readable */
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+[data-theme="light"] .focus-session--idle {
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+[data-theme="light"] .focus-session--running {
+  border-color: rgba(96, 165, 250, 0.8);
+  box-shadow: 0 12px 40px rgba(129, 140, 248, 0.35);
+}
+
+[data-theme="light"] .focus-session--completed {
+  border-color: rgba(52, 211, 153, 0.8);
+  box-shadow: 0 10px 32px rgba(52, 211, 153, 0.35);
+}
+
 .focus-tools-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -724,6 +788,16 @@ button.secondary {
   justify-content: space-between;
   row-gap: 0.75rem;
   min-height: 210px;
+}
+
+/* Light theme variant for focus tool cards so they sit nicely on the white dashboard */
+[data-theme="light"] .focus-tool-card {
+  background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.09), rgba(15, 23, 42, 0.08));
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+[data-theme="light"] .focus-tool-card:hover {
+  box-shadow: 0 10px 30px rgba(148, 163, 184, 0.5);
 }
 
 .focus-tool-card:hover {
@@ -1288,7 +1362,6 @@ body.focus-mode-active .focus-tool-card-active {
   font-size: 0.85rem;
   color: var(--muted);
   margin-bottom: 1.5rem;
-}
 }
 
 .profile-section-wrapper {

@@ -180,7 +180,7 @@
         <section class="reminder-settings-section">
             <div class="card reminder-card">
                 <h2 class="mb-1">Reminder Settings</h2>
-                <p class="muted mb-1">TimeNest can gently nudge you when tasks with due times are coming up.</p>
+                <p class="muted mb-1">TimeNest can gently nudge you when tasks with a due <strong>date &amp; time</strong> are coming up.</p>
 
                 <div class="reminder-row">
                     <div class="reminder-option">
@@ -188,7 +188,7 @@
                         <div>
                             <div class="reminder-label">Voice reminders</div>
                             <p class="muted small-label">Spoken alert when a task reaches its due time.</p>
-                            <p class="muted tiny-helper">Works only for tasks with a due date &amp; time.</p>
+                            <p class="muted tiny-helper">Helpful for accessibility and for people who like an extra nudge. Works only for tasks with a due date &amp; time.</p>
                         </div>
                     </div>
                     <label class="reminder-toggle">
@@ -202,7 +202,7 @@
                         <div class="reminder-icon" aria-hidden="true">🔔</div>
                         <div>
                             <div class="reminder-label">Browser notifications</div>
-                            <p class="muted small-label">System notifications before and at the due time.</p>
+                            <p class="muted small-label">System notifications 15 minutes before, 5 minutes before, and at the due time.</p>
                         </div>
                     </div>
                     <label class="reminder-toggle">
@@ -469,24 +469,29 @@
                 if (notifToggle) notifToggle.checked = status.notificationsEnabled !== false;
 
                 if (!statusEl) return;
-                let text = '';
+                let parts = [];
                 const blocked = status.notificationsSupported && status.permission === 'denied';
 
                 if (!status.notificationsSupported) {
-                    text = 'Notifications: Not supported in this browser.';
+                    parts.push('Notifications: Not supported in this browser.');
                 } else if (blocked) {
-                    text = 'Notifications: Blocked in browser settings. Voice reminders are disabled until you allow notifications for this site.';
+                    parts.push('Notifications: Blocked in browser settings.');
                 } else if (status.permission === 'granted' && status.notificationsEnabled !== false) {
-                    text = 'Notifications: Allowed.';
+                    parts.push('Notifications: Allowed.');
                 } else if (status.permission === 'granted' && status.notificationsEnabled === false) {
-                    text = 'Notifications: Disabled in TimeNest.';
+                    parts.push('Notifications: Disabled in TimeNest.');
                 } else {
-                    text = 'Notifications: Waiting for browser permission.';
+                    parts.push('Notifications: Waiting for browser permission.');
+                }
+                if (status.voiceSupported) {
+                    parts.push(`Voice reminders: ${status.voiceEnabled ? 'On' : 'Off'}.`);
+                } else {
+                    parts.push('Voice reminders: Not supported in this browser.');
                 }
                 if (voiceToggle) {
                     voiceToggle.disabled = !!blocked;
                 }
-                statusEl.textContent = text;
+                statusEl.textContent = parts.join(' ');
             }
 
             if (voiceToggle) {

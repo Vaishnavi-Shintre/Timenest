@@ -187,7 +187,9 @@
       if (!task.due_date || !task.id) continue;
       const dueMs = new Date(task.due_date).getTime();
       if (!Number.isFinite(dueMs)) continue;
-      if (!isUpcomingOrRecent(dueMs, now)) continue;
+      // Reminders are only enabled when both a due date and a
+      // specific due time are present.
+      if (!task.due_date || !task.due_time || !task.id) continue;
 
       const diffMs = dueMs - now; // positive: future, negative: past
 
@@ -209,6 +211,11 @@
               body: `Task "${title}" is due ${dayPart} at ${timeLabel}.`,
               tag: makeKey(task.id, t.kind),
             });
+              // Optional spoken reminder before the task is due
+              if (voiceEnabled) {
+                const minutesText = t.minutes === 1 ? '1 minute' : `${t.minutes} minutes`;
+                speak(`Your task ${title} is remaining. It is due in ${minutesText}.`);
+              }
           }
         }
       }
@@ -226,22 +233,6 @@
             tag: makeKey(task.id, 'due-now'),
           });
           speak(`Your task ${title} is due at ${timeLabel}.`);
-        }
-      }
-
-      // Single overdue reminder within 1 hour after due time
-      const ONE_HOUR_MS = 60 * 60_000;
-      if (diffMs <= -CHECK_INTERVAL_MS && diffMs >= -ONE_HOUR_MS) {
-        if (!wasSent(task.id, 'overdue')) {
-          markSent(task.id, 'overdue');
-          const { dayWord, dateLabel, timeLabel } = describeDueDateTime(dueMs, now);
-          const when = dayWord || dateLabel;
-          const title = task.title || 'Task';
-          const body = `Task "${title}" is overdue (was due ${when} at ${timeLabel}).`;
-          showNotification('⚠️ Task overdue', {
-            body,
-            tag: makeKey(task.id, 'overdue'),
-          });
         }
       }
     }

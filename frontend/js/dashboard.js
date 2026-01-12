@@ -80,6 +80,23 @@
     const existing = state.tools[toolId] || { accumulatedMs: 0, startedAt: null };
     const now = Date.now();
 
+    // Enforce a single active focus session at a time.
+    // When starting or resuming a tool, automatically pause any other
+    // running tools by rolling their elapsed time into accumulatedMs.
+    if (action === 'start' || action === 'resume') {
+      Object.entries(state.tools || {}).forEach(([id, tState]) => {
+        if (id === toolId) return;
+        if (tState && tState.startedAt) {
+          const elapsed = now - tState.startedAt;
+          state.tools[id] = {
+            ...tState,
+            startedAt: null,
+            accumulatedMs: (tState.accumulatedMs || 0) + elapsed,
+          };
+        }
+      });
+    }
+
     if (action === 'start' || action === 'resume') {
       state.tools[toolId] = {
         ...existing,
@@ -547,7 +564,9 @@
       const payload = {
         title,
         priority: priority || undefined,
-        due_date: new Date(today).toISOString(),
+        // For quick daily tasks we only attach a date; reminders will
+        // stay disabled unless a time is added elsewhere.
+        due_date: today,
       };
 
       const res = await createTask(payload);
