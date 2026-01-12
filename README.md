@@ -62,9 +62,31 @@ pip install -r backend/requirements.txt
 
 3) Configure environment variables in `backend/.env` (already templated):
 
-- `MONGO_URI` e.g. `mongodb://localhost:27017`
+Required basics:
+
+- `MONGO_URI` e.g. `mongodb://localhost:27017/?directConnection=true`
 - `MONGO_DB_NAME` e.g. `timenest`
 - `JWT_SECRET_KEY` set to a long random string
+- `SECRET_KEY` a long random string used for Flask sessions
+
+### Google OAuth 2.0 (optional, for "Sign in with Google")
+
+To enable Google login on the `/login.html` page:
+
+1. Create an **OAuth 2.0 Client ID** in Google Cloud Console (type: *Web application*).
+2. Add this as an **Authorized redirect URI** in the client:
+
+  - `http://127.0.0.1:5000/auth/google/callback`
+
+3. Add the following to `backend/.env` **without quotes and without spaces around `=`**:
+
+```dotenv
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:5000/auth/google/callback
+```
+
+> Do **not** commit real client IDs or secrets to Git. Use local `.env` only and rotate the secret if it is ever exposed.
 
 4) Run the API:
 

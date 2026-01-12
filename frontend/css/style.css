@@ -276,7 +276,7 @@ button.secondary {
 }
 
 .section-grid-spaced {
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
 .focus-layout {
@@ -306,6 +306,15 @@ button.secondary {
 
 .tasks-list-card {
   min-height: 300px;
+}
+
+/* Task form vertical rhythm */
+#task-form label + label {
+  margin-top: 1rem;
+}
+
+#task-form button[type="submit"] {
+  margin-top: 1.25rem;
 }
 
 .error-text {
@@ -461,7 +470,22 @@ button.secondary {
 
 /* Dashboard */
 .dashboard-stats {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card-header-row {
@@ -959,6 +983,48 @@ body.focus-mode-active .focus-tool-card-active {
   font-weight: 600;
 }
 
+/* Badges & achievements */
+.badges-grid {
+  gap: 1rem;
+}
+
+.badge-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 12px;
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  padding: 1.25rem 1.1rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.badge-card .badge-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.badge-card .badge-title {
+  font-weight: 600;
+}
+
+.badge-card .badge-description {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.badge-card .badge-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.badge-card.badge-locked {
+  opacity: 0.6;
+  filter: grayscale(0.1);
+}
+
 /* Profile Card Compact Styles */
 .profile-header {
   background: linear-gradient(135deg, rgba(129, 140, 248, 0.2), rgba(52, 211, 153, 0.2));
@@ -1391,6 +1457,8 @@ body.focus-mode-active .focus-tool-card-active {
 .stat-card {
   text-align: center;
   padding: 1.5rem;
+  border-radius: 16px;
+  min-height: 140px;
 }
 
 .stat-card .stat-value {
