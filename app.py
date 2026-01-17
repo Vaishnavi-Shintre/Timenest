@@ -26,3 +26,15 @@ def create_app():
         client.close()
 
     return app
+
+
+# Expose a module-level `app` for WSGI servers (gunicorn expects `app:app`).
+# This calls the factory at import time so `gunicorn app:app` works.
+app = create_app()
+
+
+if __name__ == "__main__":
+    # Local development only: run the built-in server.
+    # Do not run this in production; Render / Gunicorn will import `app` directly.
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
