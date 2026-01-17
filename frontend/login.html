@@ -25,11 +25,11 @@
         <h2>Welcome back</h2>
         <p class="muted mb-1">Stay focused and ship your best work.</p>
 
-        <form id="login-form" class="auth-form" novalidate>
+        <form id="login-form" class="auth-form">
           <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" placeholder="you@example.com" required />
-            <p class="helper-text" id="email-help">Use the email you signed up with.</p>
+            <p class="helper-text" id="email-help">Enter the email you signed up with (example: you@example.com).</p>
           </div>
 
           <div class="form-group">
@@ -55,7 +55,7 @@
       </section>
     </main>
     <script src="./js/theme.js"></script>
-    <script src="./js/auth.js"></script>
+      <script src="./js/auth.js"></script>
     <script>
       const form = document.getElementById('login-form');
       const statusEl = document.getElementById('login-status');
@@ -74,9 +74,14 @@
 
         const email = document.getElementById('email').value.trim();
         const password = passwordInput.value;
-
+        // simple email format check
+        const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         if (!email || !password) {
           statusEl.textContent = 'Please fill in both email and password.';
+          return;
+        }
+        if (!emailIsValid) {
+          statusEl.textContent = 'Please enter a valid email address (example: you@example.com).';
           return;
         }
 

@@ -1,6 +1,14 @@
 import os
 from datetime import timedelta
 
+# Load .env from project root so local development MONGO_URI is picked up
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # loads .env into environment
+except Exception:
+    # python-dotenv may not be installed in some environments; fallback to env vars
+    pass
+
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")

@@ -6,7 +6,7 @@ import os
 def create_app():
     app = Flask(__name__)
 
-    mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/?directConnection=true")
+    mongo_uri = os.environ.get("MONGO_URI", "mongodb+srv://Vaishshintre13:AceXJnrUa4tAHJmF@cluster0.ync3uv2.mongodb.net/")
     client = MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
 
     # Validate the connection up front so the root route reflects real status.
